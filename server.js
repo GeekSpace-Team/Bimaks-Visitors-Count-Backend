@@ -6,18 +6,17 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"],
 };
 
-app.use(cors(corsOptions));
+app.use(cors("*"));
 app.use(express.json());
 
 let visitorCount = 0;
-const adminToken = "bimaksAdminToken"; // Token for admin
+const adminToken = "bimaksAdminToken";
 
-// Middleware to check if request is from admin
 const checkAdmin = (req, res, next) => {
   const token = req.headers["authorization"];
   if (token === `Bearer ${adminToken}`) {
@@ -27,12 +26,10 @@ const checkAdmin = (req, res, next) => {
   }
 };
 
-// Endpoint to get visitor count
 app.get("/api/visitor-count/:siteId", (req, res) => {
   res.json({ count: visitorCount });
 });
 
-// Endpoint to increment visitor count (only if not admin)
 app.post("/api/increment-visitor-count", (req, res) => {
   const token = req.headers["authorization"];
   if (token === `Bearer ${adminToken}`) {
