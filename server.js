@@ -6,12 +6,12 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 const corsOptions = {
-  origin: "http://95.85.121.153:7757/",
+  origin: "*",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type", "Authorization", "*"],
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 let visitorCount = 0;
