@@ -1,32 +1,34 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-
+const fs = require("fs");
 const app = express();
 const port = process.env.PORT || 3001;
 
 const corsOptions = {
   origin: "*",
   methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization", "*"],
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 
-let visitorCount = 0;
 const adminToken = "bimaksAdminToken";
 
 app.get("/api/visitor-count", (req, res) => {
+  const visitorCount = fs.readFileSync("./count.txt", { encoding: "utf8" });
+  console.log(visitorCount);
   res.json({ count: visitorCount });
 });
 
-app.post("/api/increment-visitor-count", (req, res) => {
+app.post("/api/increment-visitor-count", async (req, res) => {
+  const file = fs.readFileSync("./count.txt", { encoding: "utf8" });
+  const newCount = Number(file) + 1;
+  fs.writeFileSync("./count.txt", newCount.toString(), { encoding: "utf8" });
   const token = req.headers["authorization"];
   if (token !== `Bearer ${adminToken}`) {
-    visitorCount += 1;
-    console.log(`Visitor Count Updated: ${visitorCount}`);
-    res.json({ count: visitorCount });
+    console.log(`Visitor Count Updated: ${newCount}`);
+    res.json({ count: newCount });
   } else {
     res.status(403).json({ message: "Forbidden" });
   }
